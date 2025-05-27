@@ -1,0 +1,14 @@
+# Archivos de desarrollo y configuración local
+test_neon_connection.php
+postgresql_migration.sql
+*.md
+*.ps1
+.git/
+node_modules/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Archivos de XAMPP local
+xampp/
