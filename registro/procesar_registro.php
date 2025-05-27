@@ -6,11 +6,8 @@ while (ob_get_level()) ob_end_clean();
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *"); // Opcional para desarrollo
 
-// Configuración de la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "12345";
-$dbname = "comedor_comunitario";
+// Incluir configuración de Neon PostgreSQL
+require_once '../config/database.php';
 
 // Respuesta JSON
 $response = [
@@ -31,7 +28,7 @@ try {
         if (empty($_POST[$field])) {
             throw new Exception("El campo '$field' es obligatorio", 400);
         }
-    }
+        }
 
     // 3. Validar términos
     if ($_POST['terminos'] !== 'on') {
@@ -46,13 +43,12 @@ try {
         throw new Exception("La edad debe ser entre 1 y 120 años", 400);
     }
 
-    // 5. Conectar a la base de datos
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    if ($conn->connect_error) {
-        throw new Exception("Error de conexión: " . $conn->connect_error, 500);
-    }
+    // 5. Conectar a la base de datos PostgreSQL
+    $database = new Database();
+    $conn = $database->getConnection();
 
     // 6. Preparar INSERT (con todos los campos)
+        // 6. Preparar consulta para PostgreSQL
     $stmt = $conn->prepare("
         INSERT INTO usuarios (
             nombre, 
@@ -63,26 +59,26 @@ try {
             correo, 
             contrasena, 
             fecha_registro
-        ) VALUES (?, ?, ?, ?, ?, ?, SHA2(?,256) , NOW())
+        ) VALUES (:nombre, :apellidos, :direccion, :edad, :sexo, :correo, 
+                 ENCODE(DIGEST(:contrasena, 'sha256'), 'hex'), CURRENT_TIMESTAMP)
     ");
 
     if (!$stmt) {
-        throw new Exception("Error al preparar la consulta: " . $conn->error, 500);
+        throw new Exception("Error al preparar la consulta", 500);
     }
 
-    $hashedPassword = $_POST['contrasena'];
     $correo = !empty($_POST['correo']) ? $_POST['correo'] : NULL;
 
-    $stmt->bind_param(
-        "sssisss", // Tipos: s=string, i=integer
-        $_POST['nombre'],
-        $_POST['apellidos'],
-        $_POST['direccion'],
-        $edad,
-        $_POST['sexo'],
-        $correo,
-        $hashedPassword
-    );
+    // 7. Ejecutar consulta con parámetros nombrados
+    $result = $stmt->execute([
+        ':nombre' => $_POST['nombre'],
+        ':apellidos' => $_POST['apellidos'],
+        ':direccion' => $_POST['direccion'],
+        ':edad' => $edad,
+        ':sexo' => $_POST['sexo'],
+        ':correo' => $correo,
+        ':contrasena' => $_POST['contrasena']
+    ]);
 
     // 8. Ejecutar consulta
     if ($stmt->execute()) {

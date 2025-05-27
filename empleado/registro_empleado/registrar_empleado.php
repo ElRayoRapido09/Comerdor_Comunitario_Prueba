@@ -1,20 +1,13 @@
 <?php
-// Configuración de la base de datos
-$servername = "localhost";
-$username = "root";
-$password = "12345";
-$dbname = "comedor_comunitario";
+// Configuración de la base de datos PostgreSQL
+require_once '../../config/database.php';
 
-// Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+try {
+    // Usar la configuración de PostgreSQL
+    $conn = DatabaseConfig::getConnection();
+} catch (Exception $e) {
+    die("Conexión fallida: " . $e->getMessage());
 }
-
-// Establecer el conjunto de caracteres
-$conn->set_charset("utf8");
 
 // Procesar el formulario cuando se envíe
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -60,23 +53,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST['terminos'])) {
         $errores[] = "Debes aceptar los términos y condiciones";
     }
-    
-    // Si no hay errores, insertar en la base de datos
+      // Si no hay errores, insertar en la base de datos
     if (empty($errores)) {
         try {
             // Verificar si el correo ya existe
-            $stmt = $conn->prepare("SELECT id_usuario FROM usuarios WHERE correo = ?");
-            $stmt->bind_param("s", $correo);
+            $stmt = $conn->prepare("SELECT id_usuario FROM usuarios WHERE correo = :correo");
+            $stmt->bindParam(':correo', $correo);
             $stmt->execute();
-            $stmt->store_result();
             
-            if ($stmt->num_rows > 0) {
+            if ($stmt->rowCount() > 0) {
                 $errores[] = "El correo electrónico ya está registrado";
             } else {
                 // Insertar el nuevo empleado
                 $tipo_usuario = "empleado";
-                $stmt = $conn->prepare("INSERT INTO usuarios (nombre, apellidos, correo, direccion, edad, contrasena, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssiss", $nombre, $apellidos, $correo, $direccion, $edad, $contrasena, $tipo_usuario);
+                $stmt = $conn->prepare("INSERT INTO usuarios (nombre, apellidos, correo, direccion, edad, contrasena, tipo_usuario) VALUES (:nombre, :apellidos, :correo, :direccion, :edad, :contrasena, :tipo_usuario)");
+                $stmt->bindParam(':nombre', $nombre);
+                $stmt->bindParam(':apellidos', $apellidos);
+                $stmt->bindParam(':correo', $correo);
+                $stmt->bindParam(':direccion', $direccion);
+                $stmt->bindParam(':edad', $edad, PDO::PARAM_INT);
+                $stmt->bindParam(':contrasena', $contrasena);
+                $stmt->bindParam(':tipo_usuario', $tipo_usuario);
                 
                 if ($stmt->execute()) {
                     // Éxito en el registro
@@ -85,10 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         'message' => 'Empleado registrado correctamente'
                     ];
                 } else {
-                    $errores[] = "Error al registrar el empleado: " . $stmt->error;
+                    $errores[] = "Error al registrar el empleado";
                 }
             }
-            $stmt->close();
         } catch (Exception $e) {
             $errores[] = "Error en la base de datos: " . $e->getMessage();
         }
@@ -101,12 +97,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'errors' => $errores
         ];
     }
-    
-    // Devolver respuesta JSON
+      // Devolver respuesta JSON
     header('Content-Type: application/json');
     echo json_encode($response);
     exit;
 }
 
-$conn->close();
+// No need to close PDO connection as it's automatically closed
 ?>

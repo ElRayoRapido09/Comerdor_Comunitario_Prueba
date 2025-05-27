@@ -1,18 +1,27 @@
 <?php
-$host = 'localhost'; // o tu servidor de base de datos
-$dbname = 'comedor_comunitario';
-$username = 'root';
-$password = '12345';
+/**
+ * Conexión a Neon PostgreSQL para módulo de empleados/escanear
+ */
+$host = 'ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech';
+$dbname = 'neondb';
+$username = 'neondb_owner';
+$password = 'npg_hyng4Q2aGNdP';
+$port = '5432';
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
+    
+    $conn = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+    
 } catch (PDOException $e) {
     header('Content-Type: application/json');
     die(json_encode([
         'success' => false,
-        'message' => 'Error de conexión a la base de datos',
+        'message' => 'Error de conexión a la base de datos Neon PostgreSQL',
         'error' => $e->getMessage()
     ]));
 }

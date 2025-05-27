@@ -6,14 +6,12 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 require_once 'session_check.php';
 
-$servername = "localhost";
-$username = "root";
-$password = "12345";
-$dbname = "comedor_comunitario";
+// Incluir configuración de Neon PostgreSQL
+require_once '../../config/database.php';
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database = new Database();
+    $conn = $database->getConnection();
     
     $action = $_GET['action'] ?? '';
     

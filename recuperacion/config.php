@@ -1,9 +1,11 @@
 <?php
 // config.php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '12345');
-define('DB_NAME', 'comedor_comunitario');
+// PostgreSQL database configuration for Neon
+define('DB_HOST', getenv('DB_HOST') ?: 'ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech');
+define('DB_USER', getenv('DB_USER') ?: 'neondb_owner');
+define('DB_PASS', getenv('DB_PASS') ?: 'npg_t5LQpPJkNnm2bRTKJ4dBZHs7vcftR9HG');
+define('DB_NAME', getenv('DB_NAME') ?: 'neondb');
+define('DB_PORT', getenv('DB_PORT') ?: '5432');
 
 // Configuración para el correo electrónico
 define('MAIL_HOST', 'smtp.gmail.com'); // Cambia según tu proveedor
@@ -13,16 +15,20 @@ define('MAIL_PORT', 587);
 define('MAIL_FROM', 'kawiim98@gmail.com');
 define('MAIL_FROM_NAME', 'Comedor Comunitario');
 
-// Conexión a la base de datos
+// Conexión a la base de datos PostgreSQL
 function conectarDB() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
-    if ($conn->connect_error) {
-        die("Error de conexión: " . $conn->connect_error);
+    try {
+        $endpoint_id = "ep-noisy-bush-a4xycth8"; // Extraído del hostname de Neon
+        $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";sslmode=require;options=endpoint=" . $endpoint_id;
+        $conn = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]);
+        return $conn;
+    } catch (PDOException $e) {
+        die("Error de conexión: " . $e->getMessage());
     }
-    
-    $conn->set_charset("utf8");
-    return $conn;
 }
 
 // Función para enviar correos

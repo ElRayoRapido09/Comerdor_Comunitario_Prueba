@@ -1,15 +1,12 @@
 <?php
 header('Content-Type: application/json');
 
-// Configuración de la base de datos
-$host = 'localhost';
-$dbname = 'comedor_comunitario';
-$username = 'root';
-$password = '12345';
+// Incluir configuración de Neon PostgreSQL
+require_once '../config/database.php';
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database = new Database();
+    $conn = $database->getConnection();
     
     $data = json_decode(file_get_contents('php://input'), true);
     $correo = $data['correo'];

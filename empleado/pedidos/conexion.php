@@ -1,16 +1,36 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "12345";
-$dbname = "comedor_comunitario";
+/**
+ * Conexión a Neon PostgreSQL para módulo de empleados/pedidos
+ */
+try {
+    $host = 'ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech';
+    $dbname = 'neondb';
+    $username = 'neondb_owner';
+    $password = 'npg_hyng4Q2aGNdP';
+    $port = '5432';
 
-// Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificar conexión
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    // DSN para PostgreSQL
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;sslmode=require";
+    
+    $conn = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ]);
+    
+} catch (PDOException $e) {
+    error_log("Error de conexión PostgreSQL: " . $e->getMessage());
+    die("Error de conexión a la base de datos");
 }
 
-$conn->set_charset("utf8");
+// Función helper para convertir resultado de mysqli a formato esperado
+function mysqli_to_pdo_result($conn, $query, $params = []) {
+    $stmt = $conn->prepare($query);
+    if ($params) {
+        $stmt->execute($params);
+    } else {
+        $stmt->execute();
+    }
+    return $stmt;
+}
 ?>
