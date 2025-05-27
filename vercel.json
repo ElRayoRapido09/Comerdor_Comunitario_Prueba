@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "functions": {
     "api/**/*.php": {
       "runtime": "vercel-php@0.7.0"
@@ -8,26 +9,56 @@
     }
   },
   "env": {
-    "DATABASE_URL": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require",
-    "DATABASE_URL_UNPOOLED": "postgresql://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8.us-east-1.aws.neon.tech/neondb?sslmode=require",
+    "DATABASE_URL": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&options=endpoint%3Dep-noisy-bush-a4xycth8",
     "PGHOST": "ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech",
-    "PGHOST_UNPOOLED": "ep-noisy-bush-a4xycth8.us-east-1.aws.neon.tech",
     "PGUSER": "neondb_owner",
     "PGDATABASE": "neondb",
     "PGPASSWORD": "npg_hyng4Q2aGNdP",
-    "POSTGRES_URL": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require",
-    "POSTGRES_URL_NON_POOLING": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8.us-east-1.aws.neon.tech/neondb?sslmode=require",
-    "POSTGRES_USER": "neondb_owner",
-    "POSTGRES_HOST": "ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech",
-    "POSTGRES_PASSWORD": "npg_hyng4Q2aGNdP",
-    "POSTGRES_DATABASE": "neondb",
-    "POSTGRES_URL_NO_SSL": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech/neondb",
-    "POSTGRES_PRISMA_URL": "postgres://neondb_owner:npg_hyng4Q2aGNdP@ep-noisy-bush-a4xycth8-pooler.us-east-1.aws.neon.tech/neondb?connect_timeout=15&sslmode=require"
+    "PGPORT": "5432"
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/inicio/validar_login.php",
+      "dest": "/api/validar_login.php"
+    },
+    {
+      "src": "/registro/procesar_registro.php",
+      "dest": "/api/procesar_registro.php"
+    },
+    {
+      "src": "/recuperacion/recuperar.php",
+      "dest": "/api/recuperar.php"
+    },
+    {
+      "src": "/(.*\\.(html|css|js|png|jpg|jpeg|gif|svg|ico))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Accept, Authorization"
+        }
+      ]
     }
   ]
 }

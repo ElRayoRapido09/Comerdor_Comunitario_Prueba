@@ -16,9 +16,8 @@ document.getElementById('login-form').addEventListener('submit', async function(
     // Mostrar loading
     const submitBtn = document.querySelector('.login-button');
     toggleLoading(submitBtn, true);
-    
-    try {
-      const response = await fetch('validar_login.php', {
+      try {
+      const response = await fetch('/api/validar_login.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({correo, contrasena, tipoUsuario, recordar})
@@ -27,11 +26,22 @@ document.getElementById('login-form').addEventListener('submit', async function(
       const data = await response.json();
       
       if (data.success) {
-        redirectUser(data.tipo_usuario);
+        // Guardar datos del usuario en localStorage si es necesario
+        if (recordar) {
+          localStorage.setItem('usuario_datos', JSON.stringify(data.usuario));
+        }
+        
+        // Redirigir según el tipo de usuario
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          redirectUser(data.usuario.tipo_usuario);
+        }
       } else {
         showError(data.message, data.debug);
       }
     } catch (error) {
+      console.error('Error:', error);
       showError('Error de conexión con el servidor');
     } finally {
       toggleLoading(submitBtn, false);

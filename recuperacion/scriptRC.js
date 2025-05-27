@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch('recuperar.php', {
+      const response = await fetch('/api/recuperar.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `email=${encodeURIComponent(email)}`
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch('recuperar.php', {
+      const response = await fetch('/api/recuperar.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `email=${encodeURIComponent(email)}`
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const email = passwordInput1.dataset.email;
     try {
-      const response = await fetch('recuperar.php', {
+      const response = await fetch('/api/recuperar.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `codigo=${encodeURIComponent(verificationCode)}&email=${encodeURIComponent(email)}`
@@ -194,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch('recuperar.php', {
+      const response = await fetch('/api/recuperar.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `nueva-contrasena=${encodeURIComponent(newPassword)}&confirmar-contrasena=${encodeURIComponent(confirmPassword)}&email=${encodeURIComponent(email)}`

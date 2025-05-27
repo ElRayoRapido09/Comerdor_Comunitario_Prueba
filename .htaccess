@@ -1,0 +1,37 @@
+# Configuración para Apache (si se usa hosting tradicional)
+RewriteEngine On
+
+# Redirigir archivos PHP específicos a la carpeta API
+RewriteRule ^inicio/validar_login\.php$ /api/validar_login.php [L]
+RewriteRule ^registro/procesar_registro\.php$ /api/procesar_registro.php [L]
+RewriteRule ^recuperacion/recuperar\.php$ /api/recuperar.php [L]
+
+# Habilitar CORS para todas las respuestas
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "X-Requested-With, Content-Type, Accept, Authorization"
+
+# Manejo de preflight requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Configuración de tipos MIME
+AddType application/json .json
+AddType text/javascript .js
+
+# Cache settings para archivos estáticos
+<filesMatch "\.(css|js|png|jpg|jpeg|gif|svg|ico)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+</filesMatch>
+
+# Configuración de seguridad
+<Files "*.json">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "*.php">
+    Order Allow,Deny
+    Allow from all
+</Files>

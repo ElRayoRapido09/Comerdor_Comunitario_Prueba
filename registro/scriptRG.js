@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // 1. Enviar datos al servidor
-            const response = await fetch(form.action, {
+            const response = await fetch('/api/procesar_registro.php', {
                 method: 'POST',
                 body: new FormData(form),
                 headers: { 
@@ -27,10 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Respuesta del servidor:", data);
 
             if (data.success) {
-                // 4. Redirigir tras éxito
-                window.location.href = data.redirect;
+                // 4. Mostrar mensaje de éxito y redirigir
+                alert('Usuario registrado correctamente. Serás redirigido al login.');
+                window.location.href = '/inicio/index.html';
             } else {
-                alert(`Error: ${data.message || 'Error desconocido'}`);
+                // 5. Mostrar errores específicos
+                if (data.errors && Array.isArray(data.errors)) {
+                    alert('Errores encontrados:\n' + data.errors.join('\n'));
+                } else {
+                    alert(`Error: ${data.message || 'Error desconocido'}`);
+                }
             }
         } catch (error) {
             console.error("Error completo:", error);
